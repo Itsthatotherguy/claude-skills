@@ -70,6 +70,8 @@ Invoke `pr-review-toolkit:review-pr all` using the Skill tool. This launches spe
 
 **Do NOT manually review code instead of using the agents.** The agents provide specialized, thorough analysis that manual reading cannot match.
 
+**ALWAYS use `pr-review-toolkit:review-pr` for ALL reviews in this loop — both initial and re-reviews.** Never substitute `feature-dev:code-reviewer` or any other reviewer agent. The pr-review-toolkit orchestrates multiple specialized agents; a single code-reviewer is not equivalent.
+
 ### 2. Filter to Critical and Important Only
 
 From the review summary, extract ONLY items marked **Critical** or **Important**. Ignore suggestions and positive observations - they are not actionable in this loop.
@@ -127,7 +129,9 @@ If build or tests fail, fix immediately before proceeding. Never skip to re-revi
 
 ### 6. Re-Review (MANDATORY)
 
-**This step is NOT optional.** After fixes, run `pr-review-toolkit:review-pr` again, focused on the files that changed during fixes.
+**This step is NOT optional.** After fixes, invoke `pr-review-toolkit:review-pr` again via the Skill tool, focused on the files that changed during fixes.
+
+**Use the SAME reviewer as Step 1:** `pr-review-toolkit:review-pr`. Do NOT substitute `feature-dev:code-reviewer` or launch individual review agents directly. The pr-review-toolkit provides multi-agent coverage; switching to a single-agent reviewer on re-review defeats the purpose.
 
 This catches:
 - Issues introduced by the fixes themselves
@@ -153,12 +157,14 @@ If the re-review finds new critical/important issues, go back to Step 2. There i
 | "I can fix all these manually, no need for subagents" | Subagents provide isolation and focus. Use them for non-trivial fixes. |
 | "All of these are false positives" | If >50% are false positives, re-examine your evaluation. Multiple agents flagging the same area is a strong signal. |
 | "I'll evaluate by just reading the file" | Reading alone is insufficient. Grep for handlers, check tests, read config. |
+| "I'll use feature-dev:code-reviewer for the re-review" | Wrong reviewer. Always use pr-review-toolkit:review-pr — it runs multiple specialized agents, not just one. |
 
 ## Common Mistakes
 
 | Mistake | Fix |
 |---------|-----|
 | Manual review instead of agents | Always invoke pr-review-toolkit:review-pr via Skill tool |
+| Using feature-dev:code-reviewer for re-reviews | Always use pr-review-toolkit:review-pr for ALL reviews in this loop |
 | Blindly fixing all findings | Evaluate each with receiving-code-review pattern first |
 | Skipping re-review after fixes | Re-review is mandatory, not optional |
 | Stopping after one iteration | Loop until zero critical/important findings |
